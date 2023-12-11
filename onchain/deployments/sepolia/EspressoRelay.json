@@ -1,0 +1,118 @@
+{
+  "address": "0x1fA2e8678b9EAE6048E546Be1B34a943670CF1ab",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IInputBox",
+          "name": "_inputBox",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_dapp",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_blockHash",
+          "type": "bytes"
+        }
+      ],
+      "name": "relayBlock",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xed13cdf83ef401ca1a9c81697c733fb954124fc905569db0165b13a79b961e6a",
+  "receipt": {
+    "to": "0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7",
+    "from": "0xF05D57a5BeD2d1B529C56001FC5810cc9afC0335",
+    "contractAddress": null,
+    "transactionIndex": 50,
+    "gasUsed": "280164",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x52a31a1705734c1d8756f707350fd2fe5bcfcb67a57ca961e1bca88007721628",
+    "transactionHash": "0xed13cdf83ef401ca1a9c81697c733fb954124fc905569db0165b13a79b961e6a",
+    "logs": [],
+    "blockNumber": 4868429,
+    "cumulativeGasUsed": "5662771",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x59b22D57D4f067708AB0c00552767405926dc768"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "639aa9d3155ac3cfe5f4d62b48105306",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.18+commit.87f61d96\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IInputBox\",\"name\":\"_inputBox\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_dapp\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_blockHash\",\"type\":\"bytes\"}],\"name\":\"relayBlock\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"constructor\":{\"params\":{\"_inputBox\":\"input box to send inputs to Cartesi DApps\"}},\"relayBlock(address,bytes)\":{\"details\":\"Called by clients to securely relay Espresso data to Cartesi DApps\",\"params\":{\"_blockHash\":\"Espresso block hash given as a Tagged Base64 string using a \\\"BLOCK~\\\" prefix tag\",\"_dapp\":\"The address of the DApp\"},\"returns\":{\"_0\":\"The hash of the input as returned by the Cartesi DApp's input box\"}}},\"title\":\"EspressoRelay\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"constructor\":{\"notice\":\"Constructor\"},\"relayBlock(address,bytes)\":{\"notice\":\"Relay an Espresso block hash as an input to a DApp's input box\"}},\"notice\":\"Relays Espresso blocks as inputs to Cartesi DApps\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/EspressoRelay.sol\":\"EspressoRelay\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"@cartesi/rollups/contracts/inputs/IInputBox.sol\":{\"content\":\"// (c) Cartesi and individual authors (see AUTHORS)\\n// SPDX-License-Identifier: Apache-2.0 (see LICENSE)\\n\\npragma solidity ^0.8.8;\\n\\n/// @title Input Box interface\\ninterface IInputBox {\\n    /// @notice Emitted when an input is added to a DApp's input box.\\n    /// @param dapp The address of the DApp\\n    /// @param inputIndex The index of the input in the input box\\n    /// @param sender The address that sent the input\\n    /// @param input The contents of the input\\n    /// @dev MUST be triggered on a successful call to `addInput`.\\n    event InputAdded(\\n        address indexed dapp,\\n        uint256 indexed inputIndex,\\n        address sender,\\n        bytes input\\n    );\\n\\n    /// @notice Add an input to a DApp's input box.\\n    /// @param _dapp The address of the DApp\\n    /// @param _input The contents of the input\\n    /// @return The hash of the input plus some extra metadata\\n    /// @dev MUST fire an `InputAdded` event accordingly.\\n    ///      Input larger than machine limit will raise `InputSizeExceedsLimit` error.\\n    function addInput(\\n        address _dapp,\\n        bytes calldata _input\\n    ) external returns (bytes32);\\n\\n    /// @notice Get the number of inputs in a DApp's input box.\\n    /// @param _dapp The address of the DApp\\n    /// @return Number of inputs in the DApp's input box\\n    function getNumberOfInputs(address _dapp) external view returns (uint256);\\n\\n    /// @notice Get the hash of an input in a DApp's input box.\\n    /// @param _dapp The address of the DApp\\n    /// @param _index The index of the input in the DApp's input box\\n    /// @return The hash of the input at the provided index in the DApp's input box\\n    /// @dev `_index` MUST be in the interval `[0,n)` where `n` is the number of\\n    ///      inputs in the DApp's input box. See the `getNumberOfInputs` function.\\n    function getInputHash(\\n        address _dapp,\\n        uint256 _index\\n    ) external view returns (bytes32);\\n}\\n\",\"keccak256\":\"0x95e007391405e86eeb980be9a99e5cf15b34bb5b819292d206ef8a58f9c46c25\",\"license\":\"Apache-2.0 (see LICENSE)\"},\"contracts/EspressoRelay.sol\":{\"content\":\"// SPDX-License-Identifier: UNLICENSED\\npragma solidity ^0.8.9;\\n\\nimport {IInputBox} from \\\"@cartesi/rollups/contracts/inputs/IInputBox.sol\\\";\\n\\n\\n/// @title EspressoRelay\\n/// @notice Relays Espresso blocks as inputs to Cartesi DApps\\ncontract EspressoRelay {\\n\\n    IInputBox internal inputBox;\\n\\n    /// @notice Constructor\\n    /// @param _inputBox input box to send inputs to Cartesi DApps\\n    constructor(IInputBox _inputBox) {\\n        inputBox = _inputBox;\\n    }\\n\\n    /// @notice Relay an Espresso block hash as an input to a DApp's input box\\n    /// @dev Called by clients to securely relay Espresso data to Cartesi DApps\\n    /// @param _dapp The address of the DApp\\n    /// @param _blockHash Espresso block hash given as a Tagged Base64 string using a \\\"BLOCK~\\\" prefix tag\\n    /// @return The hash of the input as returned by the Cartesi DApp's input box\\n    function relayBlock(\\n        address _dapp,\\n        bytes calldata _blockHash\\n    ) external returns (bytes32)\\n    {\\n        // TODO: perform gatekeeping to prevent relaying invalid data\\n        // - check if block is included in latest Espresso commitments, and revert if it's not\\n\\n        // relay block hash\\n        return inputBox.addInput(_dapp, _blockHash);\\n    }\\n}\\n\",\"keccak256\":\"0xf90fe505495ab2c22fc8a54c40c7805b129ba85da1dc24d4637e92ee42cc8071\",\"license\":\"UNLICENSED\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516104c43803806104c4833981810160405281019061003291906100ed565b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505061011a565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006100a88261007d565b9050919050565b60006100ba8261009d565b9050919050565b6100ca816100af565b81146100d557600080fd5b50565b6000815190506100e7816100c1565b92915050565b60006020828403121561010357610102610078565b5b6000610111848285016100d8565b91505092915050565b61039b806101296000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c806362f73a8614610030575b600080fd5b61004a600480360381019061004591906101d9565b610060565b6040516100579190610252565b60405180910390f35b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16631789cd638585856040518463ffffffff1660e01b81526004016100c0939291906102da565b6020604051808303816000875af11580156100df573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101039190610338565b90509392505050565b600080fd5b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061014182610116565b9050919050565b61015181610136565b811461015c57600080fd5b50565b60008135905061016e81610148565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f84011261019957610198610174565b5b8235905067ffffffffffffffff8111156101b6576101b5610179565b5b6020830191508360018202830111156101d2576101d161017e565b5b9250929050565b6000806000604084860312156101f2576101f161010c565b5b60006102008682870161015f565b935050602084013567ffffffffffffffff81111561022157610220610111565b5b61022d86828701610183565b92509250509250925092565b6000819050919050565b61024c81610239565b82525050565b60006020820190506102676000830184610243565b92915050565b61027681610136565b82525050565b600082825260208201905092915050565b82818337600083830152505050565b6000601f19601f8301169050919050565b60006102b9838561027c565b93506102c683858461028d565b6102cf8361029c565b840190509392505050565b60006040820190506102ef600083018661026d565b81810360208301526103028184866102ad565b9050949350505050565b61031581610239565b811461032057600080fd5b50565b6000815190506103328161030c565b92915050565b60006020828403121561034e5761034d61010c565b5b600061035c84828501610323565b9150509291505056fea26469706673582212200839520144904f5fcbf72655702e7e8ed55a98257af1c6e21a5b70d08b660d7f64736f6c63430008120033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c806362f73a8614610030575b600080fd5b61004a600480360381019061004591906101d9565b610060565b6040516100579190610252565b60405180910390f35b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16631789cd638585856040518463ffffffff1660e01b81526004016100c0939291906102da565b6020604051808303816000875af11580156100df573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101039190610338565b90509392505050565b600080fd5b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061014182610116565b9050919050565b61015181610136565b811461015c57600080fd5b50565b60008135905061016e81610148565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f84011261019957610198610174565b5b8235905067ffffffffffffffff8111156101b6576101b5610179565b5b6020830191508360018202830111156101d2576101d161017e565b5b9250929050565b6000806000604084860312156101f2576101f161010c565b5b60006102008682870161015f565b935050602084013567ffffffffffffffff81111561022157610220610111565b5b61022d86828701610183565b92509250509250925092565b6000819050919050565b61024c81610239565b82525050565b60006020820190506102676000830184610243565b92915050565b61027681610136565b82525050565b600082825260208201905092915050565b82818337600083830152505050565b6000601f19601f8301169050919050565b60006102b9838561027c565b93506102c683858461028d565b6102cf8361029c565b840190509392505050565b60006040820190506102ef600083018661026d565b81810360208301526103028184866102ad565b9050949350505050565b61031581610239565b811461032057600080fd5b50565b6000815190506103328161030c565b92915050565b60006020828403121561034e5761034d61010c565b5b600061035c84828501610323565b9150509291505056fea26469706673582212200839520144904f5fcbf72655702e7e8ed55a98257af1c6e21a5b70d08b660d7f64736f6c63430008120033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "constructor": {
+        "params": {
+          "_inputBox": "input box to send inputs to Cartesi DApps"
+        }
+      },
+      "relayBlock(address,bytes)": {
+        "details": "Called by clients to securely relay Espresso data to Cartesi DApps",
+        "params": {
+          "_blockHash": "Espresso block hash given as a Tagged Base64 string using a \"BLOCK~\" prefix tag",
+          "_dapp": "The address of the DApp"
+        },
+        "returns": {
+          "_0": "The hash of the input as returned by the Cartesi DApp's input box"
+        }
+      }
+    },
+    "title": "EspressoRelay",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "constructor": {
+        "notice": "Constructor"
+      },
+      "relayBlock(address,bytes)": {
+        "notice": "Relay an Espresso block hash as an input to a DApp's input box"
+      }
+    },
+    "notice": "Relays Espresso blocks as inputs to Cartesi DApps",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 50,
+        "contract": "contracts/EspressoRelay.sol:EspressoRelay",
+        "label": "inputBox",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_contract(IInputBox)42"
+      }
+    ],
+    "types": {
+      "t_contract(IInputBox)42": {
+        "encoding": "inplace",
+        "label": "contract IInputBox",
+        "numberOfBytes": "20"
+      }
+    }
+  }
+}
