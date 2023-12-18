@@ -1106,10 +1106,23 @@
     "@cartesi/util" "6.0.0"
     "@openzeppelin/contracts" "4.9.2"
 
+"@cartesi/rollups@^1.1.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@cartesi/rollups/-/rollups-1.2.0.tgz#522a5e0c6c4b32a643f00dbcfc06d12b2b2f7a7f"
+  integrity sha512-oLm/JYuRpUD6bg8UKFZjdSJRZ1CWOd5SM6xnjvRKMisGZcJzULYHuuzZMSMONpnFVQhFXrwJF4q0tzcOAK4oDw==
+  dependencies:
+    "@cartesi/util" "6.1.0"
+    "@openzeppelin/contracts" "4.9.2"
+
 "@cartesi/util@6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@cartesi/util/-/util-6.0.0.tgz#e24d39859a369e14d19b8348d53bf3b0857ff42f"
   integrity sha512-n5+jFRI60HOp6xOd0IDtQU/2eh/u2uojxB1xVoTHi9Qu8EXWLeCT3s3+2bsBevk1duDFtAiqQeTT8g7dcj9+7g==
+
+"@cartesi/util@6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@cartesi/util/-/util-6.1.0.tgz#45f4a55b09b89e8dab506b5c31e6c2424fad0711"
+  integrity sha512-j92nSoMHCyu6h7nZgn+MeXjkp8oa1Cy6qaImyxVXmPN2Rcqzl/TkWm/RkhbODU9rh4U3OuUteYqKRjefI3/XIQ==
 
 "@chakra-ui/accordion@2.1.11":
   version "2.1.11"
@@ -9832,6 +9845,13 @@ rollup@^2.43.1:
   integrity sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==
   optionalDependencies:
     fsevents "~2.3.2"
+
+rollups-espresso@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/rollups-espresso/-/rollups-espresso-0.1.0.tgz#e0d57e48734145664ef6e85d78b437c9a51548a7"
+  integrity sha512-LQmsjOq8C33fuGfpUheZGY31JN8YZUR6zR7X7DLNWi4DIhYi/amoUvIk47aoXkZDKV6+L95Ae8Qltor8AkNEog==
+  dependencies:
+    "@cartesi/rollups" "^1.1.0"
 
 run-parallel@^1.1.9:
   version "1.2.0"

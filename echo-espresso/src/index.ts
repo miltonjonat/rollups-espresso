@@ -15,14 +15,24 @@ console.log("HTTP rollup_server url is " + rollupServer);
 const dehashingServer = process.env.DEHASHING_SERVER_URL;
 console.log("Dehashing server url is " + dehashingServer);
 
+const ESPRESSO_RELAY_ADDRESS = "0x1fa2e8678b9eae6048e546be1b34a943670cf1ab";
+
 const handleAdvance: AdvanceRequestHandler = async (data) => {
   try {
-    // TODO: check if msg_sender is the EspressoRelay
+    // reject input if it did not come from the EspressoRelay
+    if (data.metadata.msg_sender.toLowerCase() != ESPRESSO_RELAY_ADDRESS) {
+      console.log(`Rejecting input coming from '${data.metadata.msg_sender}': only EspressoRelay inputs are accepted`);
+      return "reject";
+    }
     
     // retrieve block hash from input
     const block = Buffer.from(data.payload.slice(2), "hex").toString();
     if (!block.startsWith("BLOCK~")) {
-      console.log(`Input '${data.payload}' does not look like an Espresso block hash`);
+      let payloadSlice = data.payload;
+      if (data.payload.length > 16) {
+        payloadSlice = `${data.payload.slice(0,16)}...` as `0x${string}`;
+      }
+      console.log(`Input '${payloadSlice}' does not look like an Espresso block hash`);
       return "reject";
     }
     console.log(`Received block hash '${block}'`);

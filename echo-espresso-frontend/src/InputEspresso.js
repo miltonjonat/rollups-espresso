@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import { InputBox__factory } from "@cartesi/rollups";
+import { EspressoRelay__factory } from "rollups-espresso";
 import { Button, useToast, Card, CardBody, Stack, StackDivider, Box, Heading, Text, ButtonGroup, Input } from "@chakra-ui/react";
 
 // OBS: change Echo DApp address as appropriate
@@ -9,8 +10,11 @@ const DAPP_ADDRESS = "0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C";
 
 const ESPRESSO_BASE_URL = "https://espresso.tspre.org";
 
-// Standard configuration for local development environment
+// Standard configuration for contracts (deterministic deployment)
 const INPUTBOX_ADDRESS = "0x59b22D57D4f067708AB0c00552767405926dc768";
+const ESPRESSO_RELAY_ADDRESS = "0x1fA2e8678b9EAE6048E546Be1B34a943670CF1ab";
+
+// Standard configuration for local development environment
 const HARDHAT_DEFAULT_MNEMONIC =
     "test test test test test test test test test test test junk";
 const HARDHAT_LOCALHOST_RPC_URL = "http://localhost:8545";
@@ -79,15 +83,18 @@ function InputEspresso() {
                 `m/44'/60'/0'/0/${accountIndex}`
             ).connect(provider);
 
-            // Instantiate the InputBox contract
+            // Instantiate the contracts
             const inputBox = InputBox__factory.connect(
                 INPUTBOX_ADDRESS,
                 signer
             );
+            const espressoRelay = EspressoRelay__factory.connect(
+                ESPRESSO_RELAY_ADDRESS,
+                signer
+            );
 
             // Send the transaction
-            // TODO: submit data to EspressoRelay, instead of InputBox
-            const tx = await inputBox.addInput(DAPP_ADDRESS, ethers.utils.toUtf8Bytes(blockHash));
+            const tx = await espressoRelay.relayBlock(DAPP_ADDRESS, ethers.utils.toUtf8Bytes(blockHash));
             console.log(`transaction: ${tx.hash}`);
             toast({
                 title: "Transaction Sent",
@@ -103,7 +110,13 @@ function InputEspresso() {
             const receipt = await tx.wait(1);
 
             // Search for the InputAdded event
-            const event = receipt.events?.find((e) => e.event === "InputAdded");
+            const event = receipt.events?.map((event) => {
+                try {
+                    return inputBox.interface.parseLog(event);
+                } catch (error) {
+                    return undefined;
+                }
+            }).find((parsedEvent) => parsedEvent?.name === "InputAdded");
 
             setLoading(false);
             toast({
