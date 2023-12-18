@@ -7,7 +7,7 @@ import { Button, useToast, Card, CardBody, Stack, StackDivider, Box, Heading, Te
 // OBS: change Echo DApp address as appropriate
 const DAPP_ADDRESS = "0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C";
 
-const ESPRESSO_BASE_URL = "https://query.cortado.espresso.network";
+const ESPRESSO_BASE_URL = "https://espresso.tspre.org";
 
 // Standard configuration for local development environment
 const INPUTBOX_ADDRESS = "0x59b22D57D4f067708AB0c00552767405926dc768";
@@ -45,7 +45,7 @@ function InputEspresso() {
     useEffect(() => {
         const sendToEspresso = async () => {
             // TODO: query latest Espresso block
-            // - curl https://query.cortado.espresso.network/status/latest_block_height
+            // - curl https://espresso.tspre.org/status/latest_block_height
 
             // TODO: subscribe to Espresso websocket to listen to incoming blocks
             // - filter by [block > transaction_nmt > vm], and then check the payload
@@ -62,7 +62,7 @@ function InputEspresso() {
             })
             
             // FIXME: using a fixed block hash for now 
-            setBlockHash("BLOCK~I4T8EqVoM1KUnFXwLOJX5uUhCgN_zseDMu-Ae31NOAxZ");            
+            setBlockHash("BLOCK~xaLAQAJNDHdcBTneFN347Ymr9dabkGhGvahY4HNsVL-a");
         };
         if (fileData) {
             sendToEspresso();

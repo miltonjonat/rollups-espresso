@@ -17,6 +17,8 @@ console.log("Dehashing server url is " + dehashingServer);
 
 const handleAdvance: AdvanceRequestHandler = async (data) => {
   try {
+    // TODO: check if msg_sender is the EspressoRelay
+    
     // retrieve block hash from input
     const block = Buffer.from(data.payload.slice(2), "hex").toString();
     if (!block.startsWith("BLOCK~")) {
