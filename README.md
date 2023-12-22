@@ -13,15 +13,17 @@ In this experiment, we do a minimalistic experimentation of using Espresso solel
 
 The general procedure envisioned here to use Espresso data in Cartesi DApps is the following:
 
+![Rollups Espresso Diagram](./rollups-espresso.png)
+
 1. Client submits data to Espresso, using a VM ID derived from the Cartesi DApp's address
 1. Client waits for the data to be included in an Espresso block, and notes the block's hash
 1. Client submits the block hash to an `EspressoRelay` contract on the base layer, so that it is sent to the Cartesi DApp's back-end
-1. The `EspressoRelay` checks with Espresso's `History` contract if the block hash is indeed valid
-1. The `EspressoRelay` adds the block hash as an input to the Cartesi DApp
-1. The Cartesi Node adds the input to be processed by the DApp back-end inside the Cartesi Machine, as with any other input
-1. The DApp back-end recognizes that the input comes from the `EspressoRelay` contract, which it trusts to have verified that it is a valid Espresso block hash
-1. The DApp back-end requests the corresponding block data using the `dehashing device`
-1. The `dehashing device` fetches the specified block, and serves only the data associated with the Cartesi DApp's VM ID (derived from its address)
+1. The `EspressoRelay` contract checks with Espresso's `HotShot` contract if the block hash is indeed valid (not implemented)
+1. The `EspressoRelay` contract calls the Cartesi `InputBox` to add the block hash as an input to the Cartesi DApp
+1. The Cartesi Node reads the input from `InputBox` and sends it to be processed by the DApp back-end, as with any other input
+1. The DApp back-end recognizes that the input comes from the `EspressoRelay` contract, which it trusts to have verified as being a valid Espresso block hash
+1. The DApp back-end requests the corresponding block data using the `Dehashing Service`
+1. The `Dehashing Service` fetches the specified block, and serves only the data associated with the Cartesi DApp's VM ID (derived from its address)
 1. The DApp back-end receives the data and resumes processing
 
 In this experiment, no thought is given to on-chain dispute resolution. It is assumed that this will be resolved later on by providing some sort of proof (maybe ZK) to associate an Espresso block hash with the Cartesi merkle tree root hash of its corresponding data.
