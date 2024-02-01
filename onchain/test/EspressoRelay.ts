@@ -6,9 +6,9 @@ import { expect } from "chai";
 describe("EspressoRelay", function () {
 
   const DAPP_ADDRESS = "0x70ac08179605AF2D9e75782b8DEcDD3c22aA4D0C";
-  const BLOCK_HASH = "BLOCK~ESsqWyaBo990ogySgZSfN-K0uLhC8hdLMqMlDNMo6KS5";
+  const BLOCK_HEIGHT = 0;
 
-  it("relayBlock_success", async function () {
+  it("relayBlockHeight_success", async function () {
     // run deployments fixture and collect relevant deployed contracts info
     await deployments.fixture();
     const { InputBox, EspressoRelay } = await deployments.all();
@@ -19,7 +19,7 @@ describe("EspressoRelay", function () {
     const espressoRelay = EspressoRelay__factory.connect(EspressoRelay.address, signer);
 
     // relay block
-    const tx = await espressoRelay.relayBlock(DAPP_ADDRESS, ethers.utils.toUtf8Bytes(BLOCK_HASH));
+    const tx = await espressoRelay.relayBlockHeight(DAPP_ADDRESS);
     const events = (await tx.wait()).events;
 
     // check if payload of input that was added is indeed the block hash
@@ -29,6 +29,6 @@ describe("EspressoRelay", function () {
       } catch (error) {}
     }).find(parsedEvent => parsedEvent?.name == "InputAdded")?.args?.[3];
     console.log(JSON.stringify(input));
-    expect(ethers.utils.toUtf8String(input)).to.eql(BLOCK_HASH);
+    expect(input).to.eql(ethers.utils.hexZeroPad(ethers.utils.hexlify(BLOCK_HEIGHT), 32));
   });
 });

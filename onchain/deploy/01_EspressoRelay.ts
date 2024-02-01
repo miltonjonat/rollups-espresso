@@ -20,4 +20,4 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 };
 
 export default func;
-func.tags = ["DAppSharding"];
+func.tags = ["EspressoRelay"];
