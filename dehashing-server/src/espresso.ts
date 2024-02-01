@@ -1,6 +1,6 @@
 const ESPRESSO_BASE_URL = "https://espresso.tspre.org";
 
-async function fetchEspresso(id: string): Promise<[number, string]> {
+async function fetchEspresso(id: string): Promise<[number, string | undefined]> {
     const url = `${ESPRESSO_BASE_URL}/availability/block/hash/${id}`;
     console.log(`Fetching '${url}'`);
     const fetched = await fetch(url);
@@ -15,7 +15,7 @@ async function fetchEspresso(id: string): Promise<[number, string]> {
       console.log(`Returning payload: '${payloadHex}'`);
       return [200, payloadHex];
     } else {
-      return [404, `No valid payload found in: ${JSON.stringify(data)}]`];
+      return [404, undefined];
     }
 }
 
