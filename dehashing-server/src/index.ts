@@ -7,7 +7,7 @@ const port = 5006;
 app.get('/:domain/:id', async (req, res) => {
   console.log(`Received request for [domain='${req.params.domain}', id='${req.params.id}']`)
   try {
-    let fetchFunc: (id: string) => Promise<[number, string]>;
+    let fetchFunc: (id: string) => Promise<[number, string | undefined]>;
     switch (req.params.domain) {
       case "inputbox":
         fetchFunc = fetchInputBox;
@@ -22,8 +22,9 @@ app.get('/:domain/:id', async (req, res) => {
     res.status(status);
     res.send(data);
   } catch (error) {
+    console.error(JSON.stringify(error));
     res.status(500);
-    res.send(JSON.stringify(error));
+    res.send();
   }
 });
 
