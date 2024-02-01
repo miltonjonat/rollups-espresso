@@ -16,20 +16,18 @@ contract EspressoRelay {
         inputBox = _inputBox;
     }
 
-    /// @notice Relay an Espresso block hash as an input to a DApp's input box
-    /// @dev Called by clients to securely relay Espresso data to Cartesi DApps
+    /// @notice Relay the current Espresso block height as an input to a DApp's input box
+    /// @dev Called by clients to securely relay Espresso info to Cartesi DApps
     /// @param _dapp The address of the DApp
-    /// @param _blockHash Espresso block hash given as a Tagged Base64 string using a "BLOCK~" prefix tag
     /// @return The hash of the input as returned by the Cartesi DApp's input box
-    function relayBlock(
-        address _dapp,
-        bytes calldata _blockHash
+    function relayBlockHeight(
+        address _dapp
     ) external returns (bytes32)
     {
-        // TODO: perform gatekeeping to prevent relaying invalid data
-        // - check if block is included in latest Espresso commitments, and revert if it's not
+        // TODO: actually read the current Espresso block height from the HotShot contract
+        uint256 _blockHeight = 0;
 
         // relay block hash
-        return inputBox.addInput(_dapp, _blockHash);
+        return inputBox.addInput(_dapp, abi.encode(_blockHeight));
     }
 }
