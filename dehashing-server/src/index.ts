@@ -2,7 +2,7 @@ import express from 'express';
 import fetchInputBox from './inputbox';
 import fetchEspresso from './espresso';
 const app = express();
-const port = 5006;
+const port = process.env.PORT || 5006;
 
 app.get('/:domain/:id', async (req, res) => {
   console.log(`Received request for [domain='${req.params.domain}', id='${req.params.id}']`)
@@ -40,7 +40,15 @@ app.get('/espresso/:id', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  // TODO: read 'port' from env
-  return console.log(`Express is listening at http://localhost:${port}`);
+app.listen(port, async () => {
+  // const block = 4030n;
+  // console.log(`Get context for block ${block}..`)
+  // const context = await getContext(block);
+  // console.log("DONE: context = " + JSON.stringify(context, (key, value) =>
+  //   typeof value === 'bigint'
+  //     ? value.toString()
+  //     : value // return everything else unchanged));
+  //   )
+  // );
+  console.log(`Express is listening at http://localhost:${port}`);
 });

@@ -1,6 +1,14 @@
-const ESPRESSO_BASE_URL = "https://espresso.tspre.org";
+const ESPRESSO_BASE_URL = process.env.ESPRESSO_BASE_URL || "https://query.gibraltar.aws.espresso.network/";
 
 async function fetchEspresso(id: string): Promise<[number, string | undefined]> {
+    // TODO: block until conditions are met or until out of scope
+    // - listen to block finalized events until maxBlockNumber is received
+    // - check if espressoBlockHeight is within current epoch's InputRange (or maxBlockNumber depending on how epochs are defined)
+    //   - if not, return 403
+    // - GET `/status/latest_block_height` to check current block height
+    //   - if requested block is lower: request it, filter by VM ID / dapp, and return if there is a payload
+    //   - if higher: stream blocks from latest, until either the block arrives or the block's l1_finalized value is beyond maxBlockNumber
+    //     - if l1_finalized is beyond, return 404
     const url = `${ESPRESSO_BASE_URL}/availability/block/hash/${id}`;
     console.log(`Fetching '${url}'`);
     const fetched = await fetch(url);
