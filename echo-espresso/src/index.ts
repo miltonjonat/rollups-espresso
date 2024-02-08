@@ -17,7 +17,8 @@ const dehashingServer = process.env.DEHASHING_SERVER_URL;
 console.log("Dehashing server url is " + dehashingServer);
 
 // next Espresso block height to process
-let espressoBlockHeight: number = 336184;
+let espressoBlockHeight: number | undefined = undefined;
+// let espressoBlockHeight: number = 336184;
 
 /**
  * Posts a notice
