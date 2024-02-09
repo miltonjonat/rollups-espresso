@@ -1,17 +1,17 @@
 import createClient from "openapi-fetch";
 import { components, paths } from "./schema";
 import { numberToHex } from "viem";
+import { handleAdvance, handleInspect } from "./dapp";
 
 type AdvanceRequestData = components["schemas"]["Advance"];
 type InspectRequestData = components["schemas"]["Inspect"];
 type RequestHandlerResult = components["schemas"]["Finish"]["status"];
 type RollupsRequest = components["schemas"]["RollupRequest"];
-type InspectRequestHandler = (data: InspectRequestData) => Promise<void>;
 type AdvanceRequestHandler = (
   data: AdvanceRequestData
 ) => Promise<RequestHandlerResult>;
 
-const rollupServer = process.env.ROLLUP_HTTP_SERVER_URL;
+export const rollupServer = process.env.ROLLUP_HTTP_SERVER_URL;
 console.log("HTTP rollup_server url is " + rollupServer);
 const dehashingServer = process.env.DEHASHING_SERVER_URL;
 console.log("Dehashing server url is " + dehashingServer);
@@ -19,19 +19,6 @@ console.log("Dehashing server url is " + dehashingServer);
 // next Espresso block height to process
 let espressoBlockHeight: number | undefined = undefined;
 // let espressoBlockHeight: number = 336184;
-
-/**
- * Posts a notice
- * @param payload hex string to post as notice's payload
- */
-const postNotice = async (payload: `0x${string}`) => {
-  const { POST } = createClient<paths>({ baseUrl: rollupServer });
-  const { response } = await POST("/notice", {
-    body: { payload }
-  });
-  const json = await response.json();
-  console.log(`Notice emitted with status ${response.status} and body ${JSON.stringify(json)}`);    
-}
 
 /**
  * Fetch data from the InputBox
@@ -69,12 +56,12 @@ const fetchEspresso = async (blockNumber: number, espressoBlockHeight: number): 
   return [fetched.status, fetchedData];
 }
 
-const handleAdvance: AdvanceRequestHandler = async (data) => {
+const handleAdvanceInternal: AdvanceRequestHandler = async (data) => {
   try {
     console.log(JSON.stringify(data));
 
     // PROCESS DATA
-    postNotice(data.payload);
+    await handleAdvance(data);
 
     let blockNumber = data.metadata.block_number;
 
@@ -99,7 +86,8 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
             break;
           }
           // PROCESS DATA
-          postNotice(espressoData);
+          // TODO: loop over internal Espresso payloads, interpret signatures, extract metadata like msgSender
+          await handleAdvance({ ...data, payload: espressoData });
           espressoBlockHeight++;
         }
         outOfScope = (espressoStatus == 403);
@@ -115,10 +103,6 @@ const handleAdvance: AdvanceRequestHandler = async (data) => {
   }
 };
 
-const handleInspect: InspectRequestHandler = async (data) => {
-  console.log("Received inspect request data " + JSON.stringify(data));
-};
-
 const main = async () => {
   const { POST } = createClient<paths>({ baseUrl: rollupServer });
   let status: RequestHandlerResult = "accept";
@@ -132,7 +116,7 @@ const main = async () => {
       const data = (await response.json()) as RollupsRequest;
       switch (data.request_type) {
         case "advance_state":
-          status = await handleAdvance(data.data as AdvanceRequestData);
+          status = await handleAdvanceInternal(data.data as AdvanceRequestData);
           break;
         case "inspect_state":
           await handleInspect(data.data as InspectRequestData);
