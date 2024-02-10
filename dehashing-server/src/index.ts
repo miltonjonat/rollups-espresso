@@ -1,6 +1,6 @@
 import express from 'express';
-import fetchInputBox from './inputbox';
-import fetchEspresso from './espresso';
+import { fetchInputBox } from './inputbox';
+import { fetchEspresso } from './espresso';
 const app = express();
 const port = process.env.PORT || 5006;
 

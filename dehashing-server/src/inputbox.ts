@@ -1,17 +1,18 @@
 import { createPublicClient, http, parseAbi } from "viem";
-import getContext, { DAPP_ADDRESS, RPC_URL, getInputData } from "./context";
+import { fetchContext, DAPP_ADDRESS, RPC_URL, fetchInputData } from "./context";
 
 const INPUTBOX_ADDRESS = "0x59b22D57D4f067708AB0c00552767405926dc768"
 
-async function fetchInputBox(id: string): Promise<[number, string | undefined]> {
+export async function fetchInputBox(id: string): Promise<[number, string | undefined]> {
     // parse id as maxBlockNumber + InputBox index
     if (id.length != 130 || !id.startsWith("0x")) {
-      throw(`Invalid id '${id}': must be a hex string with 32 bytes for maxBlockNumber and 32 bytes for the inputIndex`);
+      console.log(`Invalid id '${id}': must be a hex string with 32 bytes for maxBlockNumber and 32 bytes for the inputIndex`);
+      return [404, undefined];
     }
     const maxBlockNumber = BigInt(id.slice(0,66));
     const inputIndex = BigInt("0x" + id.slice(66,130));
 
-    const context = await getContext(maxBlockNumber);
+    const context = await fetchContext(maxBlockNumber);
 
     // check if out of epoch's scope
     if (context.epoch > context.currentEpoch) {
@@ -40,7 +41,7 @@ async function fetchInputBox(id: string): Promise<[number, string | undefined]> 
       let interval: any;
       const fetchRequest = async () => {
         console.log(`Attempting to fetch input data for index '${inputIndex}'`);
-        const { blockNumber, msgSender, payload } = await getInputData(inputIndex, ["blockNumber", "msgSender", "payload"]);
+        const { blockNumber, msgSender, payload } = await fetchInputData(inputIndex, ["blockNumber", "msgSender", "payload"]);
         // return status and payload checking requested scope
         if (payload !== undefined) {
           clearInterval(interval);
@@ -56,5 +57,3 @@ async function fetchInputBox(id: string): Promise<[number, string | undefined]> 
       interval = setInterval(fetchRequest, 500);
     });
 }
-
-export default fetchInputBox;

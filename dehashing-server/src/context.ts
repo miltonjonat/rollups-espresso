@@ -14,7 +14,7 @@ type Context = {
 }
 
 
-export async function getInputData(inputIndex: bigint, fields: string[]): Promise<any> {
+export async function fetchInputData(inputIndex: bigint, fields: string[]): Promise<any> {
   const query = `{ "query": "{ input(index: ${inputIndex}) { ${fields.join(' ')} } }" }`;
   const fetched = await fetch(`${NODE_URL}/graphql`, {
     "method": "POST",
@@ -25,7 +25,7 @@ export async function getInputData(inputIndex: bigint, fields: string[]): Promis
   return json?.data?.input || {};
 }
 
-async function getCurrentInput(): Promise<bigint> {
+async function fetchCurrentInput(): Promise<bigint> {
   // retrieve total number of inputs
   const query = `{ "query": "{ inputs { totalCount } }" }`;
   const fetched = await fetch(`${NODE_URL}/graphql`, {
@@ -37,23 +37,25 @@ async function getCurrentInput(): Promise<bigint> {
   const numInputs = json?.data?.inputs?.totalCount;
 
   // searches through inputs to find the last unprocessed one (current input)
+  let currentInput:bigint = 0n;
   if (numInputs > 0) {
     for (let inputIndex = BigInt(numInputs-1); inputIndex >= 0; inputIndex--) {
-      const { status } = await getInputData(BigInt(inputIndex), ["status"]);
+      const { status } = await fetchInputData(BigInt(inputIndex), ["status"]);
       if (status !== "UNPROCESSED") {
-        console.log(`Found currentInput '${inputIndex + 1n}'`);
-        return inputIndex + 1n;
+        break;
       }
+      currentInput = inputIndex;
     }
   }
-  return 0n;
+  console.log(`Found currentInput '${currentInput}'`);
+  return currentInput;
 }
 
-async function getInputBlockNumber(inputIndex: bigint): Promise<bigint> {
+async function fetchInputBlockNumber(inputIndex: bigint): Promise<bigint> {
   return new Promise<bigint>(async resolve => {
     let interval: any;
     const fetchRequest = async () => {
-      const { blockNumber } = await getInputData(inputIndex, ["blockNumber"]);
+      const { blockNumber } = await fetchInputData(inputIndex, ["blockNumber"]);
       if (blockNumber) {
         console.log(`Found blockNumber '${blockNumber}' for input ${inputIndex}`);
         clearInterval(interval);
@@ -93,9 +95,9 @@ async function waitForBlock(blockNumber: bigint): Promise<void> {
   })
 }
 
-async function getContext(blockNumber: bigint): Promise<Context> {
-  const currentInput = await getCurrentInput();
-  const currentInputBlockNumber = await getInputBlockNumber(currentInput);
+export async function fetchContext(blockNumber: bigint): Promise<Context> {
+  const currentInput = await fetchCurrentInput();
+  const currentInputBlockNumber = await fetchInputBlockNumber(currentInput);
   const currentEpoch = computeEpoch(currentInputBlockNumber);
   const epoch = computeEpoch(blockNumber);
 
@@ -112,5 +114,3 @@ async function getContext(blockNumber: bigint): Promise<Context> {
   }
   return context;
 }
-
-export default getContext;
