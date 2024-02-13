@@ -89,6 +89,14 @@ describe("fetchEspresso", () => {
         });
     }
 
+    const assertResultWithData = (result: [number, string | undefined], data: any) => {
+        expect(result[0]).toStrictEqual(200);
+        expect(result[1]).toBeTypeOf("string");
+        expect(result[1]?.startsWith("0x")).toBeTruthy();
+        const resultJson = JSON.parse(hexToString(result[1] as `0x${string}`));
+        expect(JSON.stringify(resultJson)).toStrictEqual(JSON.stringify(data));
+    }
+
     test('invalid id', async () => {
         const result = await fetchEspresso("nothing");
         expect(result).toStrictEqual([404, undefined]);
@@ -154,10 +162,12 @@ describe("fetchEspresso", () => {
                     number: Number(context.blockNumber)
                 }
             },
+            payload: {
+            }
         }
         mockFetch(context, {}, blockData);
         const result = await fetchEspresso(id);
-        expect(result).toStrictEqual([404, undefined]);
+        assertResultWithData(result, blockData);
     })    
 
     test('espresso block with no data after filtering', async () => {
@@ -177,7 +187,8 @@ describe("fetchEspresso", () => {
         }
         mockFetch(context, {}, blockData);
         const result = await fetchEspresso(id);
-        expect(result).toStrictEqual([404, undefined]);
+        const expectedData = { ...blockData, payload: { transaction_nmt: []}};
+        assertResultWithData(result, expectedData);
     })    
 
     test('espresso block with data', async () => {
@@ -197,12 +208,7 @@ describe("fetchEspresso", () => {
         }
         mockFetch(context, {}, blockData);
         const result = await fetchEspresso(id);
-        
-        expect(result[0]).toStrictEqual(200);
-        expect(result[1]).toBeTypeOf("string");
-        expect(result[1]?.startsWith("0x")).toBeTruthy();
-        const resultJson = JSON.parse(hexToString(result[1] as `0x${string}`));
-        expect(JSON.stringify(resultJson)).toStrictEqual(JSON.stringify(blockData));
+        assertResultWithData(result, blockData);
     })    
 
     test('espresso block with filtered data', async () => {
@@ -225,13 +231,11 @@ describe("fetchEspresso", () => {
         }
         mockFetch(context, {}, blockData);
         const result = await fetchEspresso(id);
-        
-        expect(result[0]).toStrictEqual(200);
-        expect(result[1]).toBeTypeOf("string");
-        expect(result[1]?.startsWith("0x")).toBeTruthy();
-        const resultJson = JSON.parse(hexToString(result[1] as `0x${string}`));
-        expect(JSON.stringify(resultJson.header)).toStrictEqual(JSON.stringify(blockData.header));
-        expect(resultJson.payload.transaction_nmt).toStrictEqual([blockData.payload.transaction_nmt[0]]);
+
+        const expectedData = { ...blockData, payload: {
+            transaction_nmt: [blockData.payload.transaction_nmt[0]]
+        }};
+        assertResultWithData(result, expectedData);
     })    
 });
 

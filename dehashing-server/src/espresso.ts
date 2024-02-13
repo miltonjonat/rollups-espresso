@@ -31,12 +31,7 @@ async function fetchEspressoBlock(espressoBlockHeight: bigint): Promise<any> {
 
 function filterBlockByVM(block: any, vm: number): any {
   const transaction_nmt = block?.payload?.transaction_nmt?.filter((entry:any) => entry.vm === vm);
-  if (transaction_nmt?.length) {
-    return { ...block, payload: { ...block.payload, transaction_nmt } };
-  } else {
-    // no data left
-    return undefined;
-  }
+  return { ...block, payload: { ...block.payload, transaction_nmt } };
 }
 
 export async function fetchEspresso(id: string): Promise<[number, string | undefined]> {
@@ -85,15 +80,10 @@ export async function fetchEspresso(id: string): Promise<[number, string | undef
           } else {
             // filter block data considering DApp's VM ID
             const blockFiltered = filterBlockByVM(block, VM_ID);
-        
-            if (blockFiltered) {
-              let blockHex = `0x${Buffer.from(JSON.stringify(blockFiltered)).toString("hex")}`
-              console.log(`Returning block data: '${blockHex}'`);
-              resolve([200, blockHex]);
-            } else {
-              console.log(`No data for VM '${VM_ID}' in Espresso block '${espressoBlockHeight}'`);
-              resolve([404, undefined]);
-            }
+            // return filtered block data
+            let blockHex = `0x${Buffer.from(JSON.stringify(blockFiltered)).toString("hex")}`
+            console.log(`Returning block data: '${blockHex}'`);
+            resolve([200, blockHex]);
           }
         }
       };
