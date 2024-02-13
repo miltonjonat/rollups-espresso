@@ -1,10 +1,10 @@
-# syntax=docker.io/docker/dockerfile:1.4
+# syntax=docker.io/docker/dockerfile:1
 
 # build stage: includes resources necessary for installing dependencies
 
 # Here the image's platform does not necessarily have to be riscv64.
 # If any needed dependencies rely on native binaries, you must use 
-# a riscv64 image such as cartesi/node:19-jammy for the build stage,
+# a riscv64 image such as cartesi/node:20-jammy for the build stage,
 # to ensure that the appropriate binaries will be generated.
 FROM node:20.8.0-bookworm as build-stage
 
@@ -24,8 +24,9 @@ LABEL io.cartesi.rollups.ram_size=128Mi
 
 ARG MACHINE_EMULATOR_TOOLS_VERSION=0.12.0
 RUN <<EOF
+set -e
 apt-get update
-apt-get install -y --no-install-recommends busybox-static=1:1.30.1-7ubuntu3 ca-certificates=20230311ubuntu0.22.04.1 curl=7.81.0-1ubuntu1.14
+apt-get install -y --no-install-recommends busybox-static=1:1.30.1-7ubuntu3 ca-certificates=20230311ubuntu0.22.04.1 curl=7.81.0-1ubuntu1.15
 curl -fsSL https://github.com/cartesi/machine-emulator-tools/releases/download/v${MACHINE_EMULATOR_TOOLS_VERSION}/machine-emulator-tools-v${MACHINE_EMULATOR_TOOLS_VERSION}.tar.gz \
   | tar -C / --overwrite -xvzf -
 rm -rf /var/lib/apt/lists/*
