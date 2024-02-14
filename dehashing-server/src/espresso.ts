@@ -25,7 +25,7 @@ async function fetchEspressoBlock(espressoBlockHeight: bigint): Promise<any> {
   const url = `${ESPRESSO_BASE_URL}/availability/block/${espressoBlockHeight}`;
   const fetched = await fetch(url);
   const data:any = await fetched.json();
-  console.log(`Fetched Espresso block: '${JSON.stringify(data)}'`);
+  console.log(`Fetched Espresso block: height='${data?.header?.height}', hash='${data?.hash}'`);
   return data;
 }
 
