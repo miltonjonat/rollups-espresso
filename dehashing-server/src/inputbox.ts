@@ -38,13 +38,11 @@ export async function fetchInputBox(id: string): Promise<[number, string | undef
     // - input is already known to exist: poll GraphQL until we find it there
     console.log(`Fetching InputBox input '${inputIndex}' at blockNumber '${maxBlockNumber}'`);
     return new Promise<[number, string | undefined]>(async resolve => {
-      let interval: any;
       const fetchRequest = async () => {
         console.log(`Attempting to fetch input data for index '${inputIndex}'`);
         const { blockNumber, msgSender, payload } = await fetchInputData(inputIndex, ["blockNumber", "msgSender", "payload"]);
-        // return status and payload checking requested scope
         if (payload !== undefined) {
-          clearInterval(interval);
+          // return status and payload checking requested scope
           if (blockNumber > maxBlockNumber) {
             console.log(`Input beyond requested blockNumber '${maxBlockNumber}', found at '${blockNumber}'`);
             resolve([404, undefined]);
@@ -52,8 +50,11 @@ export async function fetchInputBox(id: string): Promise<[number, string | undef
             console.log(`Returning payload: '${payload}'`);
             resolve([200, msgSender + payload.slice(2)]);
           }
+        } else {
+          // input not found: try again after some time
+          setTimeout(fetchRequest, 500);
         }
       }
-      interval = setInterval(fetchRequest, 500);
+      fetchRequest();
     });
 }

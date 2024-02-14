@@ -53,16 +53,17 @@ async function fetchCurrentInput(): Promise<bigint> {
 
 async function fetchInputBlockNumber(inputIndex: bigint): Promise<bigint> {
   return new Promise<bigint>(async resolve => {
-    let interval: any;
     const fetchRequest = async () => {
       const { blockNumber } = await fetchInputData(inputIndex, ["blockNumber"]);
       if (blockNumber) {
         console.log(`Found blockNumber '${blockNumber}' for input ${inputIndex}`);
-        clearInterval(interval);
         resolve(blockNumber);
+      } else {
+        // input not available yet, try again later
+        setTimeout(fetchContext, 500);
       }
     }
-    interval = setInterval(fetchRequest, 500);
+    fetchRequest();
   })
 }
 
