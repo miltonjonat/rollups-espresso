@@ -1,6 +1,6 @@
 import createClient from "openapi-fetch";
 import { components, paths } from "./schema";
-import { numberToHex } from "viem";
+import { hexToString, numberToHex } from "viem";
 import { handleAdvance, handleInspect } from "./dapp";
 
 type AdvanceRequestData = components["schemas"]["Advance"];
@@ -17,8 +17,8 @@ const dehashingServer = process.env.DEHASHING_SERVER_URL;
 console.log("Dehashing server url is " + dehashingServer);
 
 // next Espresso block height to process
-let espressoBlockHeight: number | undefined = undefined;
-// let espressoBlockHeight: number = 336184;
+//let espressoBlockHeight: number | undefined = undefined;
+let espressoBlockHeight: number = 1284960;
 
 /**
  * Fetch data from the InputBox
@@ -50,16 +50,35 @@ const fetchEspresso = async (blockNumber: number, espressoBlockHeight: number): 
   console.log(`Fetching Espresso data for block '${blockNumber}' and Espresso block height '${espressoBlockHeight}'`);
   const fetched = await fetch(url);
   const fetchedData = await fetched.text() as `0x${string}`;
-  if (fetched.status == 200) {
-    console.log(`Fetched Espresso data: '${fetchedData}'`);
-  }
   return [fetched.status, fetchedData];
 }
 
+/**
+ * Process Espresso block data
+ * @param data AdvanceRequestData for current input
+ * @param espressoData Espresso block data
+ */
+const processEspresso = async (data: AdvanceRequestData, espressoData: `0x${string}`) => {
+  // convert Espresso block data to a JSON object and define Espresso metadata to send to DApp
+  const espressoDataObj = JSON.parse(hexToString(espressoData));
+  const espressoMetadata = {
+    hash: espressoDataObj?.hash,
+    header: espressoDataObj?.header
+  }
+  // call DApp's handleAdvance for each transaction found in block
+  for (const transaction of espressoDataObj?.payload?.transaction_nmt) {
+    console.log(`Espresso payload to handle: ${transaction.payload}`);
+    const payload = `0x${Buffer.from(transaction.payload).toString("hex")}`;
+    // TODO: attempt to decode payload signature to extract msg_sender
+    await handleAdvance({
+      metadata: { ...data.metadata, espresso: espressoMetadata },
+      payload
+    } as AdvanceRequestData);
+  }
+} 
+
 const handleAdvanceInternal: AdvanceRequestHandler = async (data) => {
   try {
-    console.log(JSON.stringify(data));
-
     // PROCESS DATA
     await handleAdvance(data);
 
@@ -85,9 +104,8 @@ const handleAdvanceInternal: AdvanceRequestHandler = async (data) => {
           if (espressoStatus != 200) {
             break;
           }
-          // PROCESS DATA
-          // TODO: loop over internal Espresso payloads, interpret signatures, extract metadata like msgSender
-          await handleAdvance({ ...data, payload: espressoData });
+          // PROCESS ESPRESSO BLOCK DATA
+          await processEspresso(data, espressoData);
           espressoBlockHeight++;
         }
         outOfScope = (espressoStatus == 403);

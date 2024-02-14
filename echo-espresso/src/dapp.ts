@@ -30,6 +30,7 @@ const postNotice = async (payload: `0x${string}`) => {
  */
 export const handleAdvance: AdvanceRequestHandler = async (data) => {
   try {
+    console.log(JSON.stringify(data));
     await postNotice(data.payload);
     return "accept";
   } catch (error) {
