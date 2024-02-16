@@ -17,8 +17,8 @@ const dehashingServer = process.env.DEHASHING_SERVER_URL;
 console.log("Dehashing server url is " + dehashingServer);
 
 // next Espresso block height to process
-//let espressoBlockHeight: number | undefined = undefined;
-let espressoBlockHeight: number = 1284960;
+// - initial value is starting point from where to process Espresso data (genesis block)
+let espressoBlockHeight: number = 1687985;
 
 /**
  * Fetch data from the InputBox

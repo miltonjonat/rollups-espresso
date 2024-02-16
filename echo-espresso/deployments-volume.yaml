@@ -1,0 +1,6 @@
+version: "3.9"
+
+services:
+    validator:
+        volumes:
+            - ./.deployments/${NETWORK:?undefined NETWORK}:/usr/share/sunodo:ro
