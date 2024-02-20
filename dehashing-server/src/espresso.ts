@@ -3,7 +3,8 @@ import { fetchContext, DAPP_ADDRESS } from "./context";
 const ESPRESSO_BASE_URL = process.env.ESPRESSO_BASE_URL || "https://query.gibraltar.aws.espresso.network";
 
 // Espresso VM ID defined as the first 8 bytes of the address (max size currently accepted by Espresso)
-const VM_ID = Number(DAPP_ADDRESS.slice(0,18));
+const VM_ID = BigInt(DAPP_ADDRESS.slice(0,18)).toString();
+console.log(`Derived Espresso VM_ID '${VM_ID}' from DAPP_ADDRESS '${DAPP_ADDRESS}'`);
 
 async function fetchLatestEspressoBlockHeight(): Promise<bigint> {
   const url = `${ESPRESSO_BASE_URL}/status/latest_block_height`;
@@ -29,8 +30,8 @@ async function fetchEspressoBlock(espressoBlockHeight: bigint): Promise<any> {
   return data;
 }
 
-function filterBlockByVM(block: any, vm: number): any {
-  const transaction_nmt = block?.payload?.transaction_nmt?.filter((entry:any) => entry.vm === vm);
+function filterBlockByVM(block: any, vm: string): any {
+  const transaction_nmt = block?.payload?.transaction_nmt?.filter((entry:any) => entry.vm == vm);
   return { ...block, payload: { ...block.payload, transaction_nmt } };
 }
 
@@ -82,7 +83,8 @@ export async function fetchEspresso(id: string): Promise<[number, string | undef
             const blockFiltered = filterBlockByVM(block, VM_ID);
             // return filtered block data
             let blockHex = `0x${Buffer.from(JSON.stringify(blockFiltered)).toString("hex")}`
-            console.log(`Returning block data: '${blockHex}'`);
+            const nTransactions = blockFiltered?.payload?.transaction_nmt?.length ?? 0;
+            console.log(`Returning data for Espresso block '${blockFiltered?.header?.height}' with ${nTransactions} transaction(s)`);
             resolve([200, blockHex]);
           }
         }
