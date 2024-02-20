@@ -68,8 +68,8 @@ It should be noted that step (3) is possible because Espresso blocks include inf
 
 To implement the proposed architecture, this repository contains the following components:
 
-- `dehashing-server`: a simple HTTP server that receives requests for InputBox inputs and Espresso blocks (and potentially other data sources), returning the corresponding data. This component is expected to run inside the Cartesi Node
-- `echo-espresso`: a back-end that requests data from both the InputBox and Espresso in a well-defined order, and outputs a notice repeating ("echoing") each payload received
+- [io-service](./io-service/): a simple HTTP server that receives requests for InputBox inputs and Espresso blocks (and potentially other data sources), returning the corresponding data. This component is expected to run inside the Cartesi Node
+- [echo-espresso](./echo-espresso/): a back-end that requests data from both the InputBox and Espresso in a well-defined order, and outputs a notice repeating ("echoing") each payload received
 
 ## Running
 
@@ -108,12 +108,12 @@ And then, start the node:
 docker compose -f $SUNODO_BIN_PATH/node/docker-compose-validator.yaml -f $SUNODO_BIN_PATH/node/docker-compose-database.yaml -f $SUNODO_BIN_PATH/node/docker-compose-explorer.yaml -f $SUNODO_BIN_PATH/node/docker-compose-anvil.yaml  -f $SUNODO_BIN_PATH/node/docker-compose-proxy.yaml -f $SUNODO_BIN_PATH/node/docker-compose-prompt.yaml -f $SUNODO_BIN_PATH/node/docker-compose-host.yaml -f $SUNODO_BIN_PATH/node/docker-compose-envfile.yaml -f ./deployments-volume.yaml --project-directory . up --attach prompt --attach validator
 ```
 
-4. In a separate terminal, start the `dehashing-server` for the deployed DApp and looking at Sepolia as the base layer (it will run on port 5006)
+4. In a separate terminal, start the `io-service` configured for the deployed DApp and using a Sepolia gateway (it will run on port 5006)
 
 ```shell
 export RPC_URL=https://eth-sepolia.g.alchemy.com/v2/<USER_KEY>
 export DAPP_ADDRESS=$(cat echo-espresso/.deployments/sepolia/dapp.json | jq -r .address)
-cd dehashing-server
+cd io-service
 yarn && yarn start
 ```
 
@@ -156,7 +156,7 @@ curl http://localhost:8080/graphql -H 'Content-Type: application/json' -d '{"que
 
 1. As noted before, for now this experiment only runs in host mode
 1. Outputs are currently only updated in the GraphQL endpoint when an L1 InputBox input is processed
-1. Data retrieval via the [dehashing-server](./dehashing-server/) is not optimized, so it's a good idea to update the `espressoBlockHeight` initial value in [echo-espresso](./echo-espresso/src/index.ts) to a current one
-1. Epoch computation in the [dehashing-server](./dehashing-server/) does not currently comply with what the Authority consensus actually does
-1. The [dehashing-server](./dehashing-server/) is currently reading L1 data from "latest" instead of "finalized", because the Node is not reading "finalized" at the moment
+1. Data retrieval via the [io-service](./io-service/) is not optimized, so it's a good idea to update the `espressoBlockHeight` initial value in [echo-espresso](./echo-espresso/src/index.ts) to a current one
+1. Epoch computation in the [io-service](./io-service/) does not currently comply with what the Authority consensus actually does
+1. The [io-service](./io-service/) is currently reading L1 data from "latest" instead of "finalized", because the Node is not reading "finalized" at the moment
 1. Back-end code should expect Espresso data to be signed and include a nonce; it should parse that to define `msgSender` and use the nonce to avoid processing duplicate payloads/transactions

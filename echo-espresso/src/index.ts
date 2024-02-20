@@ -13,8 +13,8 @@ type AdvanceRequestHandler = (
 
 export const rollupServer = process.env.ROLLUP_HTTP_SERVER_URL;
 console.log("HTTP rollup_server url is " + rollupServer);
-const dehashingServer = process.env.DEHASHING_SERVER_URL;
-console.log("Dehashing server url is " + dehashingServer);
+const ioService = process.env.IO_SERVICE_URL;
+console.log("I/O service url is " + ioService);
 
 // next Espresso block height to process
 // - initial value is starting point from where to process Espresso data (genesis block)
@@ -28,7 +28,7 @@ let espressoBlockHeight: number = 1687985;
  */
 const fetchInputBox = async (blockNumber: number, inputIndex: number): Promise<[number, `0x${string}`]> => {
   const id = numberToHex(blockNumber, { size: 32 }) + numberToHex(inputIndex, { size: 32 }).slice(2);
-  const url = `${dehashingServer}/inputbox/${id}`;
+  const url = `${ioService}/inputbox/${id}`;
   console.log(`Fetching InputBox data for block '${blockNumber}' and index '${inputIndex}'`);
   const fetched = await fetch(url);
   const fetchedData = await fetched.text() as `0x${string}`;
@@ -46,7 +46,7 @@ const fetchInputBox = async (blockNumber: number, inputIndex: number): Promise<[
  */
 const fetchEspresso = async (blockNumber: number, espressoBlockHeight: number): Promise<[number, `0x${string}`]> => {
   const id = numberToHex(blockNumber, { size: 32 }) + numberToHex(espressoBlockHeight, { size: 32 }).slice(2);
-  const url = `${dehashingServer}/espresso/${id}`;
+  const url = `${ioService}/espresso/${id}`;
   console.log(`Fetching Espresso data for block '${blockNumber}' and Espresso block height '${espressoBlockHeight}'`);
   const fetched = await fetch(url);
   const fetchedData = await fetched.text() as `0x${string}`;

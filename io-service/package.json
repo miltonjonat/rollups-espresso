@@ -1,5 +1,5 @@
 {
-  "name": "dehashing-server",
+  "name": "IO_SERVICE_URL-server",
   "version": "0.1.0",
   "description": "Server exposing an API to retrieve data given a namespace and id",
   "main": "index.js",

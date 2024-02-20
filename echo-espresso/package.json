@@ -20,8 +20,8 @@
     "build": "run-s codegen compile",
     "codegen": "ts-node schema.ts",
     "compile": "tsc && esbuild ./src/index.ts --bundle --outfile=dist/index.js --platform=node --target=node20",
-    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" DEHASHING_SERVER_URL=\"http://127.0.0.1:5006\" ts-node src/index.ts",
-    "dev": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" DEHASHING_SERVER_URL=\"http://127.0.0.1:5006\" nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+    "start": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" IO_SERVICE_URL=\"http://127.0.0.1:5006\" ts-node src/index.ts",
+    "dev": "ROLLUP_HTTP_SERVER_URL=\"http://127.0.0.1:8080/host-runner\" IO_SERVICE_URL=\"http://127.0.0.1:5006\" nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
   },
   "keywords": [
     "cartesi"
